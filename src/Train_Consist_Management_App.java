@@ -1,128 +1,81 @@
-import java.util.*;
-import java.util.stream.Collectors;
+// Custom Exception Class
+class InvalidCapacityException extends Exception {
 
-// Bogie Class
-class Bogie {
+    public InvalidCapacityException(String message) {
+        super(message);
+    }
+}
 
-    private String bogieId;
+// Passenger Bogie Class
+class PassengerBogie {
+
+    private String bogieType;
     private int capacity;
 
-    public Bogie(String bogieId, int capacity) {
-        this.bogieId = bogieId;
+    // Constructor with validation
+    public PassengerBogie(String bogieType, int capacity)
+            throws InvalidCapacityException {
+
+        // Fail-Fast Validation
+        if (capacity <= 0) {
+            throw new InvalidCapacityException(
+                    "Capacity must be greater than zero"
+            );
+        }
+
+        this.bogieType = bogieType;
         this.capacity = capacity;
     }
 
-    public String getBogieId() {
-        return bogieId;
+    public String getBogieType() {
+        return bogieType;
     }
 
     public int getCapacity() {
         return capacity;
     }
 
-    @Override
-    public String toString() {
-        return bogieId + " (Capacity: " + capacity + ")";
+    public void displayBogie() {
+        System.out.println(
+                "Passenger Bogie Created: "
+                        + bogieType
+                        + " | Capacity: "
+                        + capacity
+        );
     }
 }
 
+// Main Application
 public class Train_Consist_Management_App {
-
-    // Create Large Dataset
-    public static List<Bogie> createBogies(int count) {
-
-        List<Bogie> bogies = new ArrayList<>();
-
-        for (int i = 1; i <= count; i++) {
-
-            int capacity = (int) (Math.random() * 100) + 20;
-
-            bogies.add(
-                    new Bogie("BG-" + i, capacity)
-            );
-        }
-
-        return bogies;
-    }
-
-    // Loop-Based Filtering
-    public static List<Bogie> filterUsingLoop(List<Bogie> bogies) {
-
-        List<Bogie> filtered = new ArrayList<>();
-
-        for (Bogie bogie : bogies) {
-
-            if (bogie.getCapacity() > 60) {
-                filtered.add(bogie);
-            }
-        }
-
-        return filtered;
-    }
-
-    // Stream-Based Filtering
-    public static List<Bogie> filterUsingStream(List<Bogie> bogies) {
-
-        return bogies
-                .stream()
-                .filter(b -> b.getCapacity() > 60)
-                .collect(Collectors.toList());
-    }
 
     public static void main(String[] args) {
 
-        // Create dataset
-        List<Bogie> bogies = createBogies(10000);
+        try {
 
-        // LOOP PERFORMANCE
-        long loopStart = System.nanoTime();
+            // Valid Bogie
+            PassengerBogie bogie1 =
+                    new PassengerBogie("Sleeper", 72);
 
-        List<Bogie> loopResult =
-                filterUsingLoop(bogies);
+            bogie1.displayBogie();
 
-        long loopEnd = System.nanoTime();
+            // Invalid Bogie (Zero Capacity)
+            PassengerBogie bogie2 =
+                    new PassengerBogie("AC Chair", 0);
 
-        long loopTime =
-                loopEnd - loopStart;
+            bogie2.displayBogie();
 
-        // STREAM PERFORMANCE
-        long streamStart = System.nanoTime();
+        }
 
-        List<Bogie> streamResult =
-                filterUsingStream(bogies);
-
-        long streamEnd = System.nanoTime();
-
-        long streamTime =
-                streamEnd - streamStart;
-
-        // OUTPUT RESULTS
-        System.out.println("Loop Filtered Bogies: "
-                + loopResult.size());
-
-        System.out.println("Stream Filtered Bogies: "
-                + streamResult.size());
-
-        System.out.println();
-
-        System.out.println("Loop Execution Time: "
-                + loopTime + " ns");
-
-        System.out.println("Stream Execution Time: "
-                + streamTime + " ns");
-
-        // Verify Result Consistency
-        if (loopResult.size() == streamResult.size()) {
+        catch (InvalidCapacityException e) {
 
             System.out.println(
-                    "Results Match: Both methods returned same count."
-            );
-
-        } else {
-
-            System.out.println(
-                    "Results Mismatch!"
+                    "Exception Occurred: "
+                            + e.getMessage()
             );
         }
+
+        System.out.println(
+                "Program continues safely..."
+        );
     }
 }
