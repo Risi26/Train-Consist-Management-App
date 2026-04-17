@@ -1,8 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-// Reusing Bogie class from UC7
 class Bogie {
     String name;
     int capacity;
@@ -10,6 +8,14 @@ class Bogie {
     Bogie(String name, int capacity) {
         this.name = name;
         this.capacity = capacity;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
 
     @Override
@@ -20,31 +26,25 @@ class Bogie {
 
 public class Train_Consist_Management_App {
 
+    // Static method for reuse in test
+    public static int calculateTotalSeats(List<Bogie> bogies) {
+        return bogies.stream()
+                .map(Bogie::getCapacity)   // safer method reference
+                .reduce(0, Integer::sum);
+    }
+
     public static void main(String[] args) {
 
-        System.out.println("=== Train Consist Management App ===");
-
-        // Create list of bogies
         List<Bogie> bogies = new ArrayList<>();
         bogies.add(new Bogie("Sleeper", 72));
         bogies.add(new Bogie("AC Chair", 54));
         bogies.add(new Bogie("First Class", 24));
 
-        // Display original list
-        System.out.println("\nAll Bogies:");
+        System.out.println("All Bogies:");
         bogies.forEach(System.out::println);
 
-        // Filter bogies with capacity > 60
-        List<Bogie> filteredBogies = bogies.stream()
-                .filter(b -> b.capacity > 60)
-                .collect(Collectors.toList());
+        int totalSeats = calculateTotalSeats(bogies);
 
-        // Display filtered list
-        System.out.println("\nFiltered Bogies (Capacity > 60):");
-        filteredBogies.forEach(System.out::println);
-
-        // Verify original list unchanged
-        System.out.println("\nOriginal List After Filtering (Unchanged):");
-        bogies.forEach(System.out::println);
+        System.out.println("\nTotal Seating Capacity: " + totalSeats);
     }
 }
