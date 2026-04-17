@@ -1,39 +1,128 @@
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
+import java.util.*;
+import java.util.stream.Collectors;
+
+// Bogie Class
+class Bogie {
+
+    private String bogieId;
+    private int capacity;
+
+    public Bogie(String bogieId, int capacity) {
+        this.bogieId = bogieId;
+        this.capacity = capacity;
+    }
+
+    public String getBogieId() {
+        return bogieId;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
+    @Override
+    public String toString() {
+        return bogieId + " (Capacity: " + capacity + ")";
+    }
+}
 
 public class Train_Consist_Management_App {
 
-    // Validate Train ID: TRN-1234
-    public static boolean isValidTrainId(String trainId) {
-        Pattern pattern = Pattern.compile("TRN-\\d{4}");
-        Matcher matcher = pattern.matcher(trainId);
-        return matcher.matches();
+    // Create Large Dataset
+    public static List<Bogie> createBogies(int count) {
+
+        List<Bogie> bogies = new ArrayList<>();
+
+        for (int i = 1; i <= count; i++) {
+
+            int capacity = (int) (Math.random() * 100) + 20;
+
+            bogies.add(
+                    new Bogie("BG-" + i, capacity)
+            );
+        }
+
+        return bogies;
     }
 
-    // Validate Cargo Code: PET-AB
-    public static boolean isValidCargoCode(String cargoCode) {
-        Pattern pattern = Pattern.compile("PET-[A-Z]{2}");
-        Matcher matcher = pattern.matcher(cargoCode);
-        return matcher.matches();
+    // Loop-Based Filtering
+    public static List<Bogie> filterUsingLoop(List<Bogie> bogies) {
+
+        List<Bogie> filtered = new ArrayList<>();
+
+        for (Bogie bogie : bogies) {
+
+            if (bogie.getCapacity() > 60) {
+                filtered.add(bogie);
+            }
+        }
+
+        return filtered;
+    }
+
+    // Stream-Based Filtering
+    public static List<Bogie> filterUsingStream(List<Bogie> bogies) {
+
+        return bogies
+                .stream()
+                .filter(b -> b.getCapacity() > 60)
+                .collect(Collectors.toList());
     }
 
     public static void main(String[] args) {
 
-        String trainId = "TRN-1234";
-        String cargoCode = "PET-AB";
+        // Create dataset
+        List<Bogie> bogies = createBogies(10000);
 
-        // Validate Train ID
-        if (isValidTrainId(trainId)) {
-            System.out.println("Valid Train ID: " + trainId);
-        } else {
-            System.out.println("Invalid Train ID: " + trainId);
-        }
+        // LOOP PERFORMANCE
+        long loopStart = System.nanoTime();
 
-        // Validate Cargo Code
-        if (isValidCargoCode(cargoCode)) {
-            System.out.println("Valid Cargo Code: " + cargoCode);
+        List<Bogie> loopResult =
+                filterUsingLoop(bogies);
+
+        long loopEnd = System.nanoTime();
+
+        long loopTime =
+                loopEnd - loopStart;
+
+        // STREAM PERFORMANCE
+        long streamStart = System.nanoTime();
+
+        List<Bogie> streamResult =
+                filterUsingStream(bogies);
+
+        long streamEnd = System.nanoTime();
+
+        long streamTime =
+                streamEnd - streamStart;
+
+        // OUTPUT RESULTS
+        System.out.println("Loop Filtered Bogies: "
+                + loopResult.size());
+
+        System.out.println("Stream Filtered Bogies: "
+                + streamResult.size());
+
+        System.out.println();
+
+        System.out.println("Loop Execution Time: "
+                + loopTime + " ns");
+
+        System.out.println("Stream Execution Time: "
+                + streamTime + " ns");
+
+        // Verify Result Consistency
+        if (loopResult.size() == streamResult.size()) {
+
+            System.out.println(
+                    "Results Match: Both methods returned same count."
+            );
+
         } else {
-            System.out.println("Invalid Cargo Code: " + cargoCode);
+
+            System.out.println(
+                    "Results Mismatch!"
+            );
         }
     }
 }
