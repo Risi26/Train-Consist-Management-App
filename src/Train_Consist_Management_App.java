@@ -1,50 +1,39 @@
-import java.util.ArrayList;
-import java.util.List;
-
-class Bogie {
-    String name;
-    int capacity;
-
-    Bogie(String name, int capacity) {
-        this.name = name;
-        this.capacity = capacity;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getCapacity() {
-        return capacity;
-    }
-
-    @Override
-    public String toString() {
-        return name + " (Capacity: " + capacity + ")";
-    }
-}
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class Train_Consist_Management_App {
 
-    // Static method for reuse in test
-    public static int calculateTotalSeats(List<Bogie> bogies) {
-        return bogies.stream()
-                .map(Bogie::getCapacity)   // safer method reference
-                .reduce(0, Integer::sum);
+    // Validate Train ID: TRN-1234
+    public static boolean isValidTrainId(String trainId) {
+        Pattern pattern = Pattern.compile("TRN-\\d{4}");
+        Matcher matcher = pattern.matcher(trainId);
+        return matcher.matches();
+    }
+
+    // Validate Cargo Code: PET-AB
+    public static boolean isValidCargoCode(String cargoCode) {
+        Pattern pattern = Pattern.compile("PET-[A-Z]{2}");
+        Matcher matcher = pattern.matcher(cargoCode);
+        return matcher.matches();
     }
 
     public static void main(String[] args) {
 
-        List<Bogie> bogies = new ArrayList<>();
-        bogies.add(new Bogie("Sleeper", 72));
-        bogies.add(new Bogie("AC Chair", 54));
-        bogies.add(new Bogie("First Class", 24));
+        String trainId = "TRN-1234";
+        String cargoCode = "PET-AB";
 
-        System.out.println("All Bogies:");
-        bogies.forEach(System.out::println);
+        // Validate Train ID
+        if (isValidTrainId(trainId)) {
+            System.out.println("Valid Train ID: " + trainId);
+        } else {
+            System.out.println("Invalid Train ID: " + trainId);
+        }
 
-        int totalSeats = calculateTotalSeats(bogies);
-
-        System.out.println("\nTotal Seating Capacity: " + totalSeats);
+        // Validate Cargo Code
+        if (isValidCargoCode(cargoCode)) {
+            System.out.println("Valid Cargo Code: " + cargoCode);
+        } else {
+            System.out.println("Invalid Cargo Code: " + cargoCode);
+        }
     }
 }
